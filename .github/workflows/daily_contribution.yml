@@ -1,0 +1,33 @@
+name: Daily Contribution
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  contribute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # For contributions to count on your GitHub profile, replace the email above with your GitHub account email.
+          # e.g. git config --global user.email "your_email@example.com"
+
+      - name: Make Daily Contributions
+        run: python3 daily_contribution.py
+
+      - name: Push changes
+        run: |
+          git pull --rebase origin ${{ github.ref_name }}
+          git push origin HEAD:${{ github.ref_name }}
